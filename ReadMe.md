@@ -20,6 +20,8 @@ called "virtualising" a list or just "recycling". Basically you keep the
 to provide details of a specific element when it needs it, because it's coming
 into view.
 
+![Example Image](demo.gif)
+
 ## How to use it
 
 
