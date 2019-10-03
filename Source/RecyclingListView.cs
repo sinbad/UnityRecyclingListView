@@ -24,6 +24,14 @@ public class RecyclingListView : MonoBehaviour {
     public float PreAllocHeight = 0;
 
 
+    /// <summary>
+    /// Set the vertical normalized scroll position. 0 is bottom, 1 is top (as with ScrollRect) 
+    /// </summary>
+    public float VerticalNormalizedPosition {
+        get => scrollRect.verticalNormalizedPosition;
+        set => scrollRect.verticalNormalizedPosition = value;
+    }
+    
     protected int rowCount;
     /// <summary>
     /// Get / set the number of rows in the list. If changed, will cause a rebuild of
