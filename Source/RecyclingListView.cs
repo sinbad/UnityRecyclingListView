@@ -125,6 +125,17 @@ public class RecyclingListView : MonoBehaviour {
     /// </summary>
     /// <param name="row"></param>
     public void ScrollToRow(int row) {
+        scrollRect.verticalNormalizedPosition = GetRowScrollPosition(row);
+    }
+
+    /// <summary>
+    /// Get the normalised vertical scroll position which would centre the given row in the view,
+    /// as best as possible without scrolling outside the bounds of the content.
+    /// Use this instead of ScrollToRow if you want to control the actual scrolling yourself.
+    /// </summary>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    public float GetRowScrollPosition(int row) {
         float rowCentre = (row + 0.5f) * RowHeight();
         float vpHeight = ViewportHeight();
         float halfVpHeight = vpHeight * 0.5f;
@@ -139,12 +150,9 @@ public class RecyclingListView : MonoBehaviour {
         // Range for our purposes is between top (0) and top of vp when scrolled to bottom (contentHeight - vpHeight)
         // ScrollRect normalised position is 0 at bottom, 1 at top
         // so inverted range because 0 is bottom and our calc is top-down
-        float t = Mathf.InverseLerp(contentHeight - vpHeight, 0, vpTop);
-        scrollRect.verticalNormalizedPosition = t;
-
+        return Mathf.InverseLerp(contentHeight - vpHeight, 0, vpTop);
     }
-
-
+    
     private void Awake() {
         scrollRect = GetComponent<ScrollRect>();
     }
