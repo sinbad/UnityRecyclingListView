@@ -120,18 +120,43 @@ public class RecyclingListView : MonoBehaviour {
         RowCount = 0;
     }
 
+    /// <summary>
+    /// Scroll the viewport so that a given row is in view, preferably centred vertically.
+    /// </summary>
+    /// <param name="row"></param>
+    public void ScrollToRow(int row) {
+        float rowCentre = (row + 0.5f) * RowHeight();
+        float vpHeight = ViewportHeight();
+        float halfVpHeight = vpHeight * 0.5f;
+        // Clamp to top of content
+        float vpTop = Mathf.Max(0, rowCentre - halfVpHeight);
+        float vpBottom = vpTop + vpHeight;
+        float contentHeight = scrollRect.content.sizeDelta.y;
+        // clamp to bottom of content
+        if (vpBottom > contentHeight) // if content is shorter than vp always stop at 0
+            vpTop = Mathf.Max(0, vpTop - (vpBottom - contentHeight));
+        
+        // Range for our purposes is between top (0) and top of vp when scrolled to bottom (contentHeight - vpHeight)
+        // ScrollRect normalised position is 0 at bottom, 1 at top
+        // so inverted range because 0 is bottom and our calc is top-down
+        float t = Mathf.InverseLerp(contentHeight - vpHeight, 0, vpTop);
+        scrollRect.verticalNormalizedPosition = t;
+
+    }
+
+
     private void Awake() {
         scrollRect = GetComponent<ScrollRect>();
     }
     
     private bool CheckChildItems() {
-        float vpHeight = scrollRect.viewport.rect.height;
+        float vpHeight = ViewportHeight();
         float buildHeight = Mathf.Max(vpHeight, PreAllocHeight);
         bool rebuild = childItems == null || buildHeight > previousBuildHeight;
         if (rebuild) {
             // create a fixed number of children, we'll re-use them when scrolling
             // figure out how many we need, round up
-            int childCount = Mathf.RoundToInt(0.5f + buildHeight / (ChildPrefab.RectTransform.rect.height + RowPadding));
+            int childCount = Mathf.RoundToInt(0.5f + buildHeight / RowHeight());
             childCount += rowsAboveBelow * 2; // X before, X after
 
             if (childItems == null) 
@@ -239,6 +264,10 @@ public class RecyclingListView : MonoBehaviour {
 
     private float RowHeight() {
         return RowPadding + ChildPrefab.RectTransform.rect.height;
+    }
+
+    private float ViewportHeight() {
+        return scrollRect.viewport.rect.height;
     }
 
     private void UpdateChild(RecyclingListViewItem child, int rowIdx) {
