@@ -24,7 +24,7 @@ public class RecyclingListView : MonoBehaviour {
     public float PreAllocHeight = 0;
 
 
-    private int rowCount;
+    protected int rowCount;
     /// <summary>
     /// Get / set the number of rows in the list. If changed, will cause a rebuild of
     /// the contents of the list. Call Refresh() instead to update contents without changing
@@ -57,24 +57,24 @@ public class RecyclingListView : MonoBehaviour {
     /// </summary>
     public ItemDelegate ItemCallback; 
     
-    private ScrollRect scrollRect;
+    protected ScrollRect scrollRect;
     // circular buffer of child items which are reused
-    private RecyclingListViewItem[] childItems;
+    protected RecyclingListViewItem[] childItems;
     // the current start index of the circular buffer
-    private int childBufferStart = 0;
+    protected int childBufferStart = 0;
     // the index into source data which childBufferStart refers to 
-    private int sourceDataRowStart; 
+    protected int sourceDataRowStart; 
 
-    private bool ignoreScrollChange = false;
-    private float previousBuildHeight = 0;
-    private const int rowsAboveBelow = 1;
+    protected bool ignoreScrollChange = false;
+    protected float previousBuildHeight = 0;
+    protected const int rowsAboveBelow = 1;
 
     /// <summary>
     /// Trigger the refreshing of the list content (e.g. if you've changed some values).
     /// Use this if the number of rows hasn't changed but you want to update the contents
     /// for some other reason. All active items will have the ItemCallback invoked. 
     /// </summary>
-    public void Refresh() {
+    public virtual void Refresh() {
         ReorganiseContent(true);
     }
 
@@ -84,7 +84,7 @@ public class RecyclingListView : MonoBehaviour {
     /// </summary>
     /// <param name="rowStart"></param>
     /// <param name="count"></param>
-    public void Refresh(int rowStart, int count) {
+    public virtual void Refresh(int rowStart, int count) {
         // only refresh the overlap
         int sourceDataLimit = sourceDataRowStart + childItems.Length;
         for (int i = 0; i < count; ++i) {
@@ -103,7 +103,7 @@ public class RecyclingListView : MonoBehaviour {
     /// Refresh a single row based on its reference.
     /// </summary>
     /// <param name="item"></param>
-    public void Refresh(RecyclingListViewItem item) {
+    public virtual void Refresh(RecyclingListViewItem item) {
         for (int i = 0; i < childItems.Length; ++i) {
             int idx = WrapChildIndex(childBufferStart + i);
             if (childItems[idx] != null && childItems[idx] == item) {
@@ -116,7 +116,7 @@ public class RecyclingListView : MonoBehaviour {
     /// <summary>
     /// Quick way of clearing all the content from the list (alias for RowCount = 0)
     /// </summary>
-    public void Clear() {
+    public virtual void Clear() {
         RowCount = 0;
     }
 
@@ -124,7 +124,7 @@ public class RecyclingListView : MonoBehaviour {
     /// Scroll the viewport so that a given row is in view, preferably centred vertically.
     /// </summary>
     /// <param name="row"></param>
-    public void ScrollToRow(int row) {
+    public virtual void ScrollToRow(int row) {
         scrollRect.verticalNormalizedPosition = GetRowScrollPosition(row);
     }
 
@@ -153,11 +153,11 @@ public class RecyclingListView : MonoBehaviour {
         return Mathf.InverseLerp(contentHeight - vpHeight, 0, vpTop);
     }
     
-    private void Awake() {
+    protected virtual void Awake() {
         scrollRect = GetComponent<ScrollRect>();
     }
     
-    private bool CheckChildItems() {
+    protected virtual bool CheckChildItems() {
         float vpHeight = ViewportHeight();
         float buildHeight = Mathf.Max(vpHeight, PreAllocHeight);
         bool rebuild = childItems == null || buildHeight > previousBuildHeight;
@@ -187,23 +187,23 @@ public class RecyclingListView : MonoBehaviour {
     }
 
 
-    private void OnEnable() {
+    protected virtual void OnEnable() {
         scrollRect.onValueChanged.AddListener(OnScrollChanged);
         ignoreScrollChange = false;
     }
 
-    private void OnDisable() {
+    protected virtual void OnDisable() {
         scrollRect.onValueChanged.RemoveListener(OnScrollChanged);
     }
 
-    private void OnScrollChanged(Vector2 normalisedPos) {
+    protected virtual void OnScrollChanged(Vector2 normalisedPos) {
         // This is called when scroll bar is moved *and* when viewport changes size
         if (!ignoreScrollChange) {
             ReorganiseContent(false);
         }
     }
 
-    private void ReorganiseContent(bool clearContents) {
+    protected virtual void ReorganiseContent(bool clearContents) {
 
         if (clearContents) {
             scrollRect.StopMovement();
@@ -278,7 +278,7 @@ public class RecyclingListView : MonoBehaviour {
         return scrollRect.viewport.rect.height;
     }
 
-    private void UpdateChild(RecyclingListViewItem child, int rowIdx) {
+    protected virtual void UpdateChild(RecyclingListViewItem child, int rowIdx) {
         if (rowIdx < 0 || rowIdx >= rowCount) {
             // Out of range of data, can happen
             child.gameObject.SetActive(false);
@@ -304,14 +304,14 @@ public class RecyclingListView : MonoBehaviour {
         }
     }
     
-    private void UpdateContentHeight() {
+    protected virtual void UpdateContentHeight() {
         float height = ChildPrefab.RectTransform.rect.height * rowCount + (rowCount-1) * RowPadding;
         // apparently 'sizeDelta' is the way to set w / h 
         var sz = scrollRect.content.sizeDelta;
         scrollRect.content.sizeDelta = new Vector2(sz.x, height);
     }
 
-    private void DisableAllChildren() {
+    protected virtual void DisableAllChildren() {
         if (childItems != null) {
             for (int i = 0; i < childItems.Length; ++i) {
                 childItems[i].gameObject.SetActive(false);
