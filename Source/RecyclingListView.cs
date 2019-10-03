@@ -287,7 +287,8 @@ public class RecyclingListView : MonoBehaviour {
             float ypos = ytoppos + (1f - pivot.y) * childRect.height;
             float xpos = 0 + pivot.x * childRect.width;
             child.RectTransform.anchoredPosition = new Vector2(xpos, -ypos);
-            
+            child.NotifyCurrentAssignment(this, rowIdx);
+
             // Populate data
             ItemCallback(child, rowIdx);
 

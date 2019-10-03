@@ -8,6 +8,16 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class RecyclingListViewItem : MonoBehaviour {
 
+    private RecyclingListView parentList;
+    public RecyclingListView ParentList {
+        get => parentList;
+    }
+
+    private int currentRow;
+    public int CurrentRow {
+        get => currentRow;
+    }
+
     private RectTransform rectTransform;
     public RectTransform RectTransform {
         get {
@@ -19,6 +29,11 @@ public class RecyclingListViewItem : MonoBehaviour {
 
     private void Awake() {
         rectTransform = GetComponent<RectTransform>();
+    }
+
+    public void NotifyCurrentAssignment(RecyclingListView v, int row) {
+        parentList = v;
+        currentRow = row;
     }
     
     
