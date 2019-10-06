@@ -53,7 +53,7 @@ items needs populating with data
 6. Add your RecyclingListViewItem subclass as a component to the root of the child
 7. Make a prefab out of this child panel, then delete it from content
 8. Select the scroll view and set the Child Prefab on RecyclingListView to your prefab
-9. Create your component which will contain the model, somewhere. It doesn't matter where, so long as it has a referencetp the RecyclingListView
+9. Create your component which will contain the model, somewhere. It doesn't matter where, so long as it has a reference to the RecyclingListView
 10. Your model component should set RecyclingListView.ItemCallback, and set RecyclingListView.RowCount. The rest will happen mostly automatically as "How it works" above.
 11. Change RowCount when you alter the length of the list, or Clear() and Refresh() to
     empty or update content in-place.
