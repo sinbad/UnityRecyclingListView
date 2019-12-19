@@ -51,7 +51,7 @@ public class RecyclingListView : MonoBehaviour {
             }
         }
     }
-    
+
     /// <summary>
     /// Delegate which users should implement to populate their custom RecyclingListViewItem
     /// instances when they're needed by the list.
@@ -159,6 +159,25 @@ public class RecyclingListView : MonoBehaviour {
         // ScrollRect normalised position is 0 at bottom, 1 at top
         // so inverted range because 0 is bottom and our calc is top-down
         return Mathf.InverseLerp(contentHeight - vpHeight, 0, vpTop);
+    }
+    
+    /// <summary>
+    /// Retrieve the item instance for a given row, IF it is currently allocated for the view.
+    /// Because these items are recycled as the view moves, you should not hold on to this item beyond
+    /// the site of the call to this method.
+    /// </summary>
+    /// <param name="row">The row number</param>
+    /// <returns>The list view item assigned to this row IF it's within the window the list currently has
+    /// allocated for viewing. If row is outside this range, returns null.</returns>
+    public RecyclingListViewItem GetRowItem(int row) {
+        if (childItems != null && 
+            row >= sourceDataRowStart && row < sourceDataRowStart + childItems.Length && // within window 
+            row < rowCount) { // within overall range
+            
+            return childItems[WrapChildIndex(childBufferStart + row - sourceDataRowStart)];
+        }
+
+        return null;
     }
     
     protected virtual void Awake() {
