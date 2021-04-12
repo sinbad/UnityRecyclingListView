@@ -1,6 +1,8 @@
 
 # RecyclingListView for Unity
 
+> #### Note: I have stopped using Unity and so am not maintaining this library any more.
+
 ## What is this for?
 
 One way of making a list is simply to create every item in the list and add it to
